@@ -7,15 +7,18 @@ const nextApp = next({ dev });
 const handle = nextApp.getRequestHandler();
 require("dotenv").config({ path: "./config.env" });
 const connectDb = require("./utilsServer/connectDb");
+connectDb();
+app.use(express.json());
 const PORT = process.env.PORT || 3000;
-app.use(express.json()); // this is the body parser
-// connectDb();
 
 nextApp.prepare().then(() => {
-    app.all('*', (req, res) => handle(req, res));
+  app.use("/api/signup", require("./api/signup"));
+  app.use("/api/auth", require("./api/auth"));
 
-    server.listen(PORT, err => {
-        if (err) throw err;
-        console.log(`listening ${PORT}...`)
-    })
-})
+  app.all("*", (req, res) => handle(req, res));
+
+  server.listen(PORT, err => {
+    if (err) throw err;
+    console.log("Express server running");
+  });
+});
